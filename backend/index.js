@@ -2,6 +2,17 @@ const {Resolver} = require('dns');
 let dns = require('dns');
 const express = require('express')
 const cors = require('cors')
+var MongoClient  = require('mongodb').MongoClient;
+const url = "mongodb://localhost:27017/nlpUser";
+const mongoose = require('mongoose');
+const ObjectID = require('mongodb').ObjectID;
+
+mongoose.connect(url, function(err)
+{
+	if(err)
+		throw err;
+	console.log("Mongoose connection established");
+});
 
 const app = express()
 const port = 5000
