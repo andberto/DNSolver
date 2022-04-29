@@ -1,0 +1,17 @@
+[{
+  "_id": {
+    "$oid": "626b947c1e8ece3933964d19"
+  },
+  "name": "andrea",
+  "password": "prova",
+  "surname": "tombini",
+  "username": "pippo",
+  "preferences": {
+    "primary_dns": "8.8.8.8",
+    "secondary_dns": "8.8.4.4"
+  },
+  "history": [
+    "/resolve/ip/104.85.9.142",
+    "/resolve/mx/unipr.it"
+  ]
+}]
