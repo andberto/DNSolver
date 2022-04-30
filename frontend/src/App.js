@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import PrivateRoute from './components/PrivateRoute.jsx'
 import Login from './components/Login.jsx'
 import Dashboard from './components/Dashboard.jsx'
+import './style.css';
 
 function App() {
   return (

@@ -1,27 +1,79 @@
 const {Resolver} = require('dns');
 let dns = require('dns');
-const express = require('express')
-const cors = require('cors')
+const express = require('express');
+const cors = require('cors');
 var MongoClient  = require('mongodb').MongoClient;
-const url = "mongodb://localhost:27017/nlpUser";
+const url = "mongodb://localhost:27017/DNSolver";
 const mongoose = require('mongoose');
 const ObjectID = require('mongodb').ObjectID;
+const bodyParser = require('body-parser');
 
-mongoose.connect(url, function(err)
-{
-	if(err)
-		throw err;
+mongoose.connect(url, function(err){
+	if(err) throw err;
 	console.log("Mongoose connection established");
 });
+
+const userSchema = mongoose.Schema({
+	_id: mongoose.Schema.Types.ObjectId,
+	name: String,
+	surname: String,
+	username: String,
+	password: String,
+	preferences: Object,
+	history: Array,
+},
+{
+	collection: 'users',
+	versionKey: false
+});
+
+const user = mongoose.model('users', userSchema);
 
 const app = express()
 const port = 5000
 const userResolvers = {};
 
-app.use(cors())
+app.use(cors());
+app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-  res.send("Hello World");
+app.post('/login', (req, res) => {
+	var username = req.body.username;
+    var password = req.body.password;
+	var query = { username: username, password: password };
+
+	user.find(query, function(err, result){
+		if(err){
+            res.status(500).send("Internal Server Error");
+        }else if (result.length == 0 && !err){
+            res.status(404).send("Not Found");
+        }else if(result.length > 0 && !err) {
+            res.status(200).send({
+				name: result[0].name,
+				surname: result[0].surname,
+				username: result[0].username,
+			});
+        }
+	});
+})
+
+app.get('/:username/history', (req, res) => {
+
+    var username = req.params.username;
+	var query = { username: username };
+console.log(username);
+	user.find(query, function(err, result){
+		console.log(result[0]);
+		if(err){
+            res.status(500).send("Internal Server Error");
+        }else if (result.length == 0 && !err){
+            res.status(404).send("Not Found");
+        }else if(result.length > 0 && !err) {
+
+            res.status(200).send({
+				history: result[0].history,
+			});
+        }
+	});
 })
 
 // da hostname a indirizzo IpV4

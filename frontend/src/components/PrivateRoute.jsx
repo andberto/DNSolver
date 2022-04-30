@@ -5,7 +5,7 @@ import AuthContext from "../contexts/AuthContext.jsx";
 const PrivateRoute = ({ children }) => {
     const { auth } = useContext(AuthContext);
     return (
-        auth ? children : <Navigate to="/login"/>
+        auth.success ? children : <Navigate to="/login"/>
     );
 };
 
