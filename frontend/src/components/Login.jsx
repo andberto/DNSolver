@@ -133,9 +133,9 @@ const Login = () => {
                   onChange={(e) => setUser(e.target.value)}
                   error = { isFormInvalid }
                   id="username"
-                  label="Email address"
+                  label="Username"
                   name="username"
-                  autoComplete="email"
+                  autoComplete="username"
                   autoFocus
                   style={{color: 'white'}}
                 />
