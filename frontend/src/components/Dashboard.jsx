@@ -24,6 +24,22 @@ const formatResult = (item) => {
 const Dashboard = () => {
     const { auth } = useContext(AuthContext);
     const [items, setItems] = useState([]);
+    const [checked, setChecked] = useState({
+        'A': false,
+        'AAAA': false,
+        'SOA': false,
+        'IP': false,
+        'CAA': false,
+        'SERVICE': false,
+        'LOOKUP': false,
+        'CNAME': false,
+        'MX': false,
+        'NS': false,
+        'SRV': false,
+        'PTR': false,
+        'TXT': false,
+        'ANY': false
+    });
     const [searchString, setSearchString] = useState("");
 
     const handleOnSearch = (string, results) => {
@@ -35,7 +51,11 @@ const Dashboard = () => {
     };
 
     const handleOnSelect = (item) => {
-        //setSearchString(string);
+        setSearchString(item.request);
+        for (const [key, value] of Object.entries(checked)) {
+            checked[key] = false;
+        }
+        checked[item.type] = true;
     };
 
     const handleOnFocus = () => {
@@ -46,8 +66,42 @@ const Dashboard = () => {
       console.log("Cleared");
     };
 
-    function test(){
-        alert('ciao');
+    function handleCheckOnClick(id) {
+        var tmp = {};
+        Object.assign(tmp, checked);
+        if(tmp[id]) {
+            tmp[id] = false;
+        }
+        else if(!tmp[id]) {
+            tmp[id] = true;
+        }
+        setChecked(tmp);
+    }
+
+    function handleQuery() {
+        // mettere dizionario per risultati
+        for (const [key, value] of Object.entries(checked)) {
+            var query = Constants.BACKEND_URL + auth.username;
+            if(checked[key]) {
+                if(key === "MX") {query += (Constants.MX + searchString);}
+                if(key === "A") {query += (Constants.A + searchString);}
+                if(key === "AAAA") {query += (Constants.AAAA + searchString);}
+                if(key === "SOA") {query += (Constants.SOA + searchString);}
+                if(key === "IP") {query += (Constants.IP + searchString);}
+                if(key === "CAA") {query += (Constants.CAA + searchString);}
+                if(key === "SERVICE") {query += (Constants.SERVICE + searchString);}
+                if(key === "CNAME") {query += (Constants.CNAME + searchString);}
+                if(key === "MX") {query += (Constants.MX + searchString);}
+                if(key === "NS") {query += (Constants.NS + searchString);}
+                if(key === "service") {query += (Constants.SRV + searchString);}
+                if(key === "PTR") {query += (Constants.PTR + searchString);}
+                if(key === "TXT") {query += (Constants.TXT + searchString);}
+                axios.get(query + '/history/').then(function (res) {
+                    setItems(res.data.history);
+                });
+            }
+        }
+
     }
 
     useEffect(() => {
@@ -62,27 +116,28 @@ const Dashboard = () => {
             <FancyBar/>
             <div style={{position: 'absolute', left: '50%', top: '35%', transform: 'translate(-50%, -50%)'}}>
                 <Stack direction="row" style={{justifyContent: 'center'}}>
-                    <FancyCheckbox label = 'MX' onChange = {test}/>
-                    <FancyCheckbox label = 'AAAA' onChange = {test}/>
-                    <FancyCheckbox label = 'IP' onChange = {test}/>
-                    <FancyCheckbox label = 'SOA' onChange = {test}/>
-                    <FancyCheckbox label = 'CAA' onChange = {test}/>
-                    <FancyCheckbox label = 'LOOKUP' onChange = {test}/>
-                    <FancyCheckbox label = 'CNAME' onChange = {test}/>
-                    <FancyCheckbox label = 'A' onChange = {test}/>
-                    <FancyCheckbox label = 'NS' onChange = {test}/>
-                    <FancyCheckbox label = 'SRV' onChange = {test}/>
-                    <FancyCheckbox label = 'PTR' onChange = {test}/>
-                    <FancyCheckbox label = 'TXT' onChange = {test}/>
-                    <FancyCheckbox label = 'ANY' onChange = {test}/>
+                    <FancyCheckbox label = 'MX' isChecked={checked['MX']} onChange = {() => handleCheckOnClick('MX')} />
+                    <FancyCheckbox label = 'AAAA'  isChecked={checked['AAAA']} onChange = {() => handleCheckOnClick('AAAA')}/>
+                    <FancyCheckbox label = 'IP'  isChecked={checked['IP']} onChange = {() => handleCheckOnClick('IP')}/>
+                    <FancyCheckbox label = 'SOA'  isChecked={checked['SOA']} onChange = {() => handleCheckOnClick('SOA')}/>
+                    <FancyCheckbox label = 'CAA'  isChecked={checked['CAA']} onChange = {() => handleCheckOnClick('CAA')}/>
+                    <FancyCheckbox label = 'LOOKUP' isChecked={checked['LOOKUP']}  onChange = {() => handleCheckOnClick('LOOKUP')}/>
+                    <FancyCheckbox label = 'CNAME' isChecked={checked['CNAME']} onChange = {() => handleCheckOnClick('CNAME')}/>
+                    <FancyCheckbox label = 'A'  isChecked={checked['A']} onChange = {() => handleCheckOnClick('A')}/>
+                    <FancyCheckbox label = 'NS' isChecked={checked['NS']}  onChange = {() => handleCheckOnClick('NS')}/>
+                    <FancyCheckbox label = 'SRV'  isChecked={checked['SRV']} onChange = {() => handleCheckOnClick('SRV')}/>
+                    <FancyCheckbox label = 'PTR' isChecked={checked['PTR']}  onChange = {() => handleCheckOnClick('PTR')}/>
+                    <FancyCheckbox label = 'TXT'  isChecked={checked['TXT']} onChange = {() => handleCheckOnClick('TXT')}/>
+                    <FancyCheckbox label = 'ANY'  isChecked={checked['ANY']} onChange = {() => handleCheckOnClick('ANY')}/>
                 </Stack>
                 <Stack direction='row'>
                     <div style={{width: '75vw'}}>
                       <ReactSearchAutocomplete
-                        onSelect={handleOnSelect}
+                        onSelect = {handleOnSelect}
                         items={items}
                         onSearch={handleOnSearch}
                         onClear={handleOnClear}
+                        showClear={false}
                         inputSearchString={searchString}
                         inputDebounce={500}
                         autoFocus
@@ -91,7 +146,7 @@ const Dashboard = () => {
                         fuseOptions={{keys: ['request']}}
                       />
                     </div>
-                    <FancyButton/>
+                    <FancyButton onClick={handleQuery}/>
                 </Stack>
             </div>
         </>

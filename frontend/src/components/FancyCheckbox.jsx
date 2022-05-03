@@ -6,7 +6,7 @@ export default function FancyCheckbox(props) {
     return (
         <FormControlLabel style={{
             color: '#fff'
-        }} control={<Checkbox onChange={props.onChange} sx={{
+        }} control={<Checkbox checked={props.isChecked} onChange={props.onChange}  sx={{
             color: "#fff",'&.Mui-checked': {color: "#13aa52",},
         }} />} label={props.label} />
     );
