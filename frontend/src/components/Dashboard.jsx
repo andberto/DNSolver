@@ -7,6 +7,7 @@ import * as Constants from '../Constants';
 import FancyCheckbox from './FancyCheckbox.jsx';
 import FancyButton from './FancyButton.jsx';
 import Stack from '@mui/material/Stack';
+import FancyTable from './FancyTable.jsx';
 
 const formatResult = (item) => {
   console.log(item);
@@ -24,6 +25,7 @@ const formatResult = (item) => {
 const Dashboard = () => {
     const { auth } = useContext(AuthContext);
     const [items, setItems] = useState([]);
+    const [results, setResults] = useState({});
     const [checked, setChecked] = useState({
         'A': false,
         'AAAA': false,
@@ -79,7 +81,7 @@ const Dashboard = () => {
     }
 
     function handleQuery() {
-        // mettere dizionario per risultati
+        setResults({});
         for (const [key, value] of Object.entries(checked)) {
             var query = Constants.BACKEND_URL + auth.username;
             if(checked[key]) {
@@ -100,10 +102,21 @@ const Dashboard = () => {
                 //console.log(query + Constants.MX + searchString);
                 axios.get(query).then(function (res) {
                     console.log(res.data);
+                    var tmp = {};
+                    Object.assign(tmp, results);
+                    tmp[key] = res.data;
+                    setResults(tmp);
+                });
+
+                axios.put(Constants.BACKEND_URL + auth.username + '/history', {
+                    entry: { type: key, request: searchString }
+                }).then(function (response) {
+                    var tmp = [];
+                    Object.assign(tmp, response.data);
+                    setItems(tmp);
                 });
             }
         }
-
     }
 
     useEffect(() => {
@@ -116,7 +129,7 @@ const Dashboard = () => {
     return (
         <>
             <FancyBar/>
-            <div style={{position: 'absolute', left: '50%', top: '35%', transform: 'translate(-50%, -50%)'}}>
+            <div style={{position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)'}}>
                 <Stack direction="row" style={{justifyContent: 'center'}}>
                     <FancyCheckbox label = 'MX' isChecked={checked['MX']} onChange = {() => handleCheckOnClick('MX')} />
                     <FancyCheckbox label = 'AAAA'  isChecked={checked['AAAA']} onChange = {() => handleCheckOnClick('AAAA')}/>
@@ -150,7 +163,10 @@ const Dashboard = () => {
                     </div>
                     <FancyButton onClick={handleQuery}/>
                 </Stack>
+
+                <FancyTable results={results}/>
             </div>
+
         </>
     );
   }

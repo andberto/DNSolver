@@ -60,15 +60,12 @@ app.get('/:username/history', (req, res) => {
 
     var username = req.params.username;
 	var query = { username: username };
-console.log(username);
 	user.find(query, function(err, result){
-		console.log(result[0]);
 		if(err){
             res.status(500).send("Internal Server Error");
         }else if (result.length == 0 && !err){
             res.status(404).send("Not Found");
         }else if(result.length > 0 && !err) {
-
             res.status(200).send({
 				history: result[0].history,
 			});
@@ -76,8 +73,26 @@ console.log(username);
 	});
 })
 
+app.put('/:username/history', (req, res) => {
+	var newEntry = req.body.entry;
+	var username = req.params.username;
+	user.updateOne(
+		{username: username},
+		{$addToSet: { history: newEntry }},
+		function(err,raw){
+			if(!err){
+				var query = { username: username };
+				user.find(query, function(err2, result){
+					if(!err2) res.status(200).send(result[0].history);
+					else res.status(500).send("Internal server error");
+				});
+			}
+		}
+	);
+});
+
 // da hostname a indirizzo IpV4
-app.get(':username/resolve/a/:hostname', (req, res) => {
+app.get('/:username/resolve/a/:hostname', (req, res) => {
   var username = req.params.username;
   var resolver = new Resolver();
   var hostname = req.params.hostname;
@@ -86,10 +101,10 @@ app.get(':username/resolve/a/:hostname', (req, res) => {
     res.status(200).send(addresses);
     console.log(err);
   });
-})
+});
 
 // da hostname a indirizzo IpV6
-app.get(':username/resolve/aaaa/:hostname', (req, res) => {
+app.get('/:username/resolve/aaaa/:hostname', (req, res) => {
   var hostname = req.params.hostname;
   var username = req.params.username;
   var resolver = new Resolver();
@@ -102,7 +117,7 @@ app.get(':username/resolve/aaaa/:hostname', (req, res) => {
 
 // qua ci va resolve any
 
-app.get(':username/resolve/soa/:domain', (req, res) => {
+app.get('/:username/resolve/soa/:domain', (req, res) => {
   var domain = req.params.domain;
   var username = req.params.username;
   var resolver = new Resolver();
@@ -114,7 +129,7 @@ app.get(':username/resolve/soa/:domain', (req, res) => {
 })
 
 // da IpV4 o IpV6 ad hostname
-app.get(':username/resolve/ip/:ip', (req, res) => {
+app.get('/:username/resolve/ip/:ip', (req, res) => {
   var ip = req.params.ip;
   var username = req.params.username;
   var resolver = new Resolver();
@@ -126,7 +141,7 @@ app.get(':username/resolve/ip/:ip', (req, res) => {
 })
 
 // ritorna CA per un record dns
-app.get(':username/resolve/caa/:domain', (req, res) => {
+app.get('/:username/resolve/caa/:domain', (req, res) => {
   var domain = req.params.domain;
   var username = req.params.username;
   var resolver = new Resolver();
@@ -138,7 +153,7 @@ app.get(':username/resolve/caa/:domain', (req, res) => {
 })
 
 // Risolve indirizzo IP e porta in un hostname e in un servizio attivo su una porta
-app.get(':username/lookup/service/:ip/:port', (req, res) => {
+app.get('/:username/lookup/service/:ip/:port', (req, res) => {
   var ip = req.params.ip;
   var port = req.params.port;
 
@@ -147,7 +162,7 @@ app.get(':username/lookup/service/:ip/:port', (req, res) => {
   });
 })
 
-app.get(':username/resolve/cname/:hostname', (req, res) => {
+app.get('/:username/resolve/cname/:hostname', (req, res) => {
   var hostname = req.params.hostname;
   var username = req.params.username;
   var resolver = new Resolver();
@@ -159,7 +174,7 @@ app.get(':username/resolve/cname/:hostname', (req, res) => {
 })
 
 // Torna i record mx per un certo dominio
-app.get(':username/resolve/mx/:domain', (req, res) => {
+app.get('/:username/resolve/mx/:domain', (req, res) => {
   var domain = req.params.domain;
   var username = req.params.username;
   var resolver = new Resolver();
@@ -171,7 +186,7 @@ app.get(':username/resolve/mx/:domain', (req, res) => {
 })
 
 // name server disponibili per un hostname
-app.get(':username/resolve/ns/:domain', (req, res) => {
+app.get('/:username/resolve/ns/:domain', (req, res) => {
   var domain = req.params.domain;
   var username = req.params.username;
   var resolver = new Resolver();
@@ -183,7 +198,7 @@ app.get(':username/resolve/ns/:domain', (req, res) => {
 })
 
 // name server disponibili per un hostname
-app.get(':username/resolve/srv/:hostname', (req, res) => {
+app.get('/:username/resolve/srv/:hostname', (req, res) => {
   var hostname = req.params.hostname;
   var username = req.params.username;
   var resolver = new Resolver();
@@ -194,7 +209,7 @@ app.get(':username/resolve/srv/:hostname', (req, res) => {
   });
 })
 
-app.get(':username/resolve/ptr/:hostname', (req, res) => {
+app.get('/:username/resolve/ptr/:hostname', (req, res) => {
   var hostname = req.params.hostname;
   var username = req.params.username;
   var resolver = new Resolver();
@@ -206,7 +221,7 @@ app.get(':username/resolve/ptr/:hostname', (req, res) => {
 })
 
 // Torna alcune informazioni
-app.get(':username/resolve/txt/:hostname', (req, res) => {
+app.get('/:username/resolve/txt/:hostname', (req, res) => {
   var hostname = req.params.hostname;
   var username = req.params.username;
   var resolver = new Resolver();
@@ -218,7 +233,7 @@ app.get(':username/resolve/txt/:hostname', (req, res) => {
 })
 
 // Ritorna i server impostati per il resolver
-app.get(':username/config/servers', (req, res) => {
+app.get('/:username/config/servers', (req, res) => {
   var username = req.params.username;
   var resolver = new Resolver();
 
@@ -227,7 +242,7 @@ app.get(':username/config/servers', (req, res) => {
 })
 
 // Setta un name server per la risoluzione
-app.post(':username/config/servers', (req, res) => {
+app.post('/:username/config/servers', (req, res) => {
   var username = req.params.username;
   var resolver = new Resolver();
   userResolvers[username].setServers(
