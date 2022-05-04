@@ -16,8 +16,8 @@ const ColorButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-export default function FancyButton() {
+export default function FancyButton(props) {
   return (
-    <ColorButton variant="contained">QUERY</ColorButton>
+    <ColorButton onClick={props.onClick} variant="contained">QUERY</ColorButton>
   );
 }

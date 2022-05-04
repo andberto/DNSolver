@@ -84,20 +84,22 @@ const Dashboard = () => {
             var query = Constants.BACKEND_URL + auth.username;
             if(checked[key]) {
                 if(key === "MX") {query += (Constants.MX + searchString);}
-                if(key === "A") {query += (Constants.A + searchString);}
-                if(key === "AAAA") {query += (Constants.AAAA + searchString);}
-                if(key === "SOA") {query += (Constants.SOA + searchString);}
-                if(key === "IP") {query += (Constants.IP + searchString);}
-                if(key === "CAA") {query += (Constants.CAA + searchString);}
-                if(key === "SERVICE") {query += (Constants.SERVICE + searchString);}
-                if(key === "CNAME") {query += (Constants.CNAME + searchString);}
-                if(key === "MX") {query += (Constants.MX + searchString);}
-                if(key === "NS") {query += (Constants.NS + searchString);}
-                if(key === "service") {query += (Constants.SRV + searchString);}
-                if(key === "PTR") {query += (Constants.PTR + searchString);}
-                if(key === "TXT") {query += (Constants.TXT + searchString);}
-                axios.get(query + '/history/').then(function (res) {
-                    setItems(res.data.history);
+                else if(key === "A") {query += (Constants.A + searchString);}
+                else if(key === "AAAA") {query += (Constants.AAAA + searchString);}
+                else if(key === "SOA") {query += (Constants.SOA + searchString);}
+                else if(key === "IP") {query += (Constants.IP + searchString);}
+                else if(key === "CAA") {query += (Constants.CAA + searchString);}
+                else if(key === "SERVICE") {query += (Constants.SERVICE + searchString);}
+                else if(key === "CNAME") {query += (Constants.CNAME + searchString);}
+                else if(key === "MX") {query += (Constants.MX + searchString);}
+                else if(key === "NS") {query += (Constants.NS + searchString);}
+                else if(key === "SRV") {query += (Constants.SRV + searchString);}
+                else if(key === "PTR") {query += (Constants.PTR + searchString);}
+                else if(key === "TXT") {query += (Constants.TXT + searchString);}
+                console.log(query);
+                //console.log(query + Constants.MX + searchString);
+                axios.get(query).then(function (res) {
+                    console.log(res.data);
                 });
             }
         }
