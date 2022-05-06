@@ -10,7 +10,6 @@ import Stack from '@mui/material/Stack';
 import FancyTable from './FancyTable.jsx';
 
 const formatResult = (item) => {
-  console.log(item);
   return (
     <div className="result-wrapper">
         <span className="result-span" style= {{
@@ -49,7 +48,6 @@ const Dashboard = () => {
     };
 
     const handleOnHover = (result) => {
-      console.log(result);
     };
 
     const handleOnSelect = (item) => {
@@ -80,9 +78,37 @@ const Dashboard = () => {
         setChecked(tmp);
     }
 
+    async function getResults(queries){
+        var results = {};
+        for (const key of Object.keys(queries)){
+            var res  = await axios.get(queries[key].query);
+            results[key] = {host: queries[key].host, payload: res.data};
+        };
+
+        return results;
+    }
+
+    async function getHistory(queries) {
+        var results = [];
+        var res = [];
+        for (const key of Object.keys(queries)){
+            res = await axios.put(Constants.BACKEND_URL + auth.username + '/history', {
+                        entry: { type: key, request: queries[key].host }
+                      });
+
+        };
+        results = res.data;
+
+        return results;
+    }
+
     function handleQuery() {
-        setResults({});
-        for (const [key, value] of Object.entries(checked)) {
+        setResults(new Object());
+        var queries = {};
+        var history = [];
+        var tempItems = new Array();
+
+        Object.keys(checked).forEach(key => {
             var query = Constants.BACKEND_URL + auth.username;
             if(checked[key]) {
                 if(key === "MX") {query += (Constants.MX + searchString);}
@@ -98,25 +124,22 @@ const Dashboard = () => {
                 else if(key === "SRV") {query += (Constants.SRV + searchString);}
                 else if(key === "PTR") {query += (Constants.PTR + searchString);}
                 else if(key === "TXT") {query += (Constants.TXT + searchString);}
-                console.log(query);
-                //console.log(query + Constants.MX + searchString);
-                axios.get(query).then(function (res) {
-                    console.log(res.data);
-                    var tmp = {};
-                    Object.assign(tmp, results);
-                    tmp[key] = res.data;
-                    setResults(tmp);
-                });
 
-                axios.put(Constants.BACKEND_URL + auth.username + '/history', {
-                    entry: { type: key, request: searchString }
-                }).then(function (response) {
-                    var tmp = [];
-                    Object.assign(tmp, response.data);
-                    setItems(tmp);
-                });
+                queries[key] = {host: searchString, query: query};
             }
-        }
+        });
+
+        getResults(queries).then(res => {
+            setResults(res);
+            console.log(res)
+        });
+        getHistory(queries).then(res => {
+            setItems(res);
+            //console.log(res);
+        });
+
+        //setItems(tempItems);
+
     }
 
     useEffect(() => {
@@ -158,7 +181,7 @@ const Dashboard = () => {
                         autoFocus
                         styling={{hoverBackgroundColor: "#eee"}}
                         formatResult={formatResult}
-                        fuseOptions={{keys: ['request']}}
+                        fuseOptions={{keys: ['type', 'request']}}
                       />
                     </div>
                     <FancyButton onClick={handleQuery}/>

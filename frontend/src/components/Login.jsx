@@ -16,6 +16,7 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import bgImg from '../images/background.png'
 import * as Constants from '../Constants';
+import FancyCheckbox from './FancyCheckbox.jsx';
 
 const WhiteBorderTextField = styled(TextField)`
   & label.Mui-focused {
@@ -35,8 +36,15 @@ const Login = () => {
     const [pwd, setPwd] = useState('');
     const navigate = useNavigate();
     const [isFormInvalid, setIsFormInvalid] = useState(false);
+    const [checked, setChecked] = useState(false);
 
     useEffect(() => {
+        var prevAuth = JSON.parse(localStorage.getItem('auth'));
+        if(prevAuth && prevAuth.success) {
+            setAuth(prevAuth);
+            navigate('/dashboard');
+        }
+
         document.title = "DNSolver - Login"
         userRef.current.focus();
     }, [])
@@ -54,6 +62,14 @@ const Login = () => {
                 surname: response.data.surname,
                 username: response.data.username
             });
+
+            if(checked){
+                localStorage.setItem('auth', JSON.stringify({ success: true,
+                name: response.data.name,
+                surname: response.data.surname,
+                username: response.data.username }));
+            }
+
             navigate('/dashboard');
         })
         .catch(function (error) {
@@ -70,6 +86,15 @@ const Login = () => {
                 console.log('Unknown cause (login failed)!');
             }
         });
+    }
+
+    const handleCheckOnClick = (e) => {
+        const checked = e.target.checked;
+        if (checked) {
+            setChecked(true);
+        } else {
+            setChecked(false);
+        }
     }
 
     function Copyright(props) {
@@ -154,6 +179,7 @@ const Login = () => {
                   autoComplete="current-password"
                   style={{ color: 'white'}}
                 />
+                <FancyCheckbox label = 'Remember me' onChange = {handleCheckOnClick} />
                 <Button
                   type="submit"
                   fullWidth

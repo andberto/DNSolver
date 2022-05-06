@@ -15,10 +15,11 @@ import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
-function createData(type, request) {
+function createData(type, host, payload) {
   return {
-      type,
-      request
+      type: type,
+      host: host,
+      payload: payload
   }
 }
 
@@ -39,31 +40,27 @@ function Row(props) {
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row">
-          {row.name}
+          {row.type}
         </TableCell>
-        <TableCell align="right">{row.calories}</TableCell>
-        <TableCell align="right">{row.fat}</TableCell>
-        <TableCell align="right">{row.carbs}</TableCell>
-        <TableCell align="right">{row.protein}</TableCell>
+        <TableCell align="right">{row.host}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Typography variant="h6" gutterBottom component="div">
-                History
+                Details
               </Typography>
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Customer</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right">Total price ($)</TableCell>
+                  {Object.keys(row.payload[0]).map((field) => (
+                      <TableCell>{field}</TableCell>
+                  ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row.history.map((historyRow) => (
+                  {[].map((historyRow) => (
                     <TableRow key={historyRow.date}>
                       <TableCell component="th" scope="row">
                         {historyRow.date}
@@ -104,12 +101,15 @@ Row.propTypes = {
 };
 
 export default function FancyTable(props) {
-    var rows = [];
+    const [rows, setRows] = useState([]);
     useEffect(() => {
+        setRows([]);
+        var tmp = [];
         for (const [key, value] of Object.entries(props.results)) {
-            rows.push(createData(key, value));
+            tmp.push(createData(key, value["host"], value["payload"]));
         }
-    }, [props, rows])
+        setRows(tmp);
+    }, [props, setRows])
 
   return (
     <TableContainer component={Paper}>
@@ -123,7 +123,7 @@ export default function FancyTable(props) {
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <Row key={row.name} row={row} />
+            <Row key = {row.type + row.host} row={row} />
           ))}
         </TableBody>
       </Table>
