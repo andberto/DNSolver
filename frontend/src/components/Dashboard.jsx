@@ -117,7 +117,7 @@ const Dashboard = () => {
                 else if(key === "SOA") {query += (Constants.SOA + searchString);}
                 else if(key === "IP") {query += (Constants.IP + searchString);}
                 else if(key === "CAA") {query += (Constants.CAA + searchString);}
-                else if(key === "SERVICE") {query += (Constants.SERVICE + searchString);}
+                else if(key === "LOOKUP") {query += (Constants.SERVICE + searchString);}
                 else if(key === "CNAME") {query += (Constants.CNAME + searchString);}
                 else if(key === "MX") {query += (Constants.MX + searchString);}
                 else if(key === "NS") {query += (Constants.NS + searchString);}

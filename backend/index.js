@@ -98,7 +98,13 @@ app.get('/:username/resolve/a/:hostname', (req, res) => {
   var hostname = req.params.hostname;
 
   resolver.resolve4(hostname, function (err, addresses, family) {
-    res.status(200).send(addresses);
+	var entries = [];
+
+  	for(var i = 0; i < addresses.length; i++){
+  		entries.push({IP: addresses[i]})
+  	}
+
+    res.status(200).send(entries);
     console.log(err);
   });
 });
@@ -110,7 +116,13 @@ app.get('/:username/resolve/aaaa/:hostname', (req, res) => {
   var resolver = new Resolver();
 
   resolver.resolve6(hostname, function (err, addresses, family) {
-    res.status(200).send(addresses);
+	var entries = [];
+
+	for(var i = 0; i < addresses.length; i++){
+		entries.push({IP: addresses[i]})
+	}
+
+    res.status(200).send(entries);
     console.log(err);
   });
 })
@@ -122,8 +134,8 @@ app.get('/:username/resolve/soa/:domain', (req, res) => {
   var username = req.params.username;
   var resolver = new Resolver();
 
-  resolver.resolveSoa(domain, function (err, address) {
-    res.status(200).send(address);
+  resolver.resolveSoa(domain, function (err, entry) {
+    res.status(200).send([entry]);
     console.log(err);
   });
 })
@@ -135,7 +147,12 @@ app.get('/:username/resolve/ip/:ip', (req, res) => {
   var resolver = new Resolver();
 
   resolver.reverse(ip, function (err, hostnames) {
-    res.status(200).send(hostnames);
+	var entries = [];
+
+	for(var i = 0; i < hostnames.length; i++){
+	  entries.push({Hostname: hostnames[i]})
+	}
+    res.status(200).send(entries);
     console.log(err);
   });
 })
@@ -158,7 +175,8 @@ app.get('/:username/lookup/service/:ip/:port', (req, res) => {
   var port = req.params.port;
 
   dns.lookupService(ip, parseInt(port), function (err, hostname, service) {
-      res.status(200).send(hostname + " " + service);
+	  console.log(err);
+      res.status(200).send([{Host: hostname, Port: port, Service: service}]);
   });
 })
 
@@ -168,7 +186,13 @@ app.get('/:username/resolve/cname/:hostname', (req, res) => {
   var resolver = new Resolver();
 
   resolver.resolveCname(hostname, function (err, addresses) {
-    res.status(200).send(addresses);
+	var entries = [];
+
+	for(var i = 0; i < addresses.length; i++){
+	entries.push({Hostname: addresses[i]})
+	}
+
+    res.status(200).send(entries);
     console.log(err);
   });
 })
@@ -192,7 +216,13 @@ app.get('/:username/resolve/ns/:domain', (req, res) => {
   var resolver = new Resolver();
 
   resolver.resolveNs(domain, function (err, addresses) {
-    res.status(200).send(addresses);
+	var entries = [];
+
+  	for(var i = 0; i < addresses.length; i++){
+  		entries.push({NameServer: addresses[i]})
+  	}
+
+    res.status(200).send(entries);
     console.log(err);
   });
 })
@@ -209,12 +239,12 @@ app.get('/:username/resolve/srv/:hostname', (req, res) => {
   });
 })
 
-app.get('/:username/resolve/ptr/:hostname', (req, res) => {
-  var hostname = req.params.hostname;
+app.get('/:username/resolve/ptr/:ip', (req, res) => {
+  var ip = req.params.ip;
   var username = req.params.username;
   var resolver = new Resolver();
 
-  username.resolvePtr(hostname, function (err, addresses) {
+  resolver.resolvePtr(ip, function (err, addresses) {
     res.status(200).send(addresses);
     console.log(err);
   });
@@ -226,8 +256,14 @@ app.get('/:username/resolve/txt/:hostname', (req, res) => {
   var username = req.params.username;
   var resolver = new Resolver();
 
-  username.resolveTxt(hostname, function (err, addresses) {
-    res.status(200).send(addresses);
+  resolver.resolveTxt(hostname, function (err, txts) {
+	var entries = [];
+
+	for(var i = 0; i < txts.length; i++){
+	  entries.push({Value: txts[i]})
+	}
+
+    res.status(200).send(entries);
     console.log(err);
   });
 })

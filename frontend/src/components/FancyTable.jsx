@@ -60,16 +60,11 @@ function Row(props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {[].map((historyRow) => (
-                    <TableRow key={historyRow.date}>
-                      <TableCell component="th" scope="row">
-                        {historyRow.date}
-                      </TableCell>
-                      <TableCell>{historyRow.customerId}</TableCell>
-                      <TableCell align="right">{historyRow.amount}</TableCell>
-                      <TableCell align="right">
-                        {Math.round(historyRow.amount * row.price * 100) / 100}
-                      </TableCell>
+                  {row.payload.map((row, index) => (
+                    <TableRow key={ index }>
+                      {Object.values(row).map((value) => (
+                        <TableCell>{ value }</TableCell>
+                      ))}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -109,6 +104,7 @@ export default function FancyTable(props) {
             tmp.push(createData(key, value["host"], value["payload"]));
         }
         setRows(tmp);
+        console.log(tmp);
     }, [props, setRows])
 
   return (
@@ -118,7 +114,7 @@ export default function FancyTable(props) {
           <TableRow>
             <TableCell />
             <TableCell>Type</TableCell>
-            <TableCell align="right">Request</TableCell>
+            <TableCell align="right">Target</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
