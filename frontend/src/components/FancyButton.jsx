@@ -6,11 +6,16 @@ import { purple } from '@mui/material/colors';
 
 const ColorButton = styled(Button)(({ theme }) => ({
   color: 'white',
+  textAlign: 'Right',
+  top: '-0.5px',
+  left: '-20px',
+  minWidth: '120px',
   backgroundColor: '#13aa52',
-  borderRadius: '24px',
-  left: '-80px',
+  borderBottomRightRadius: '24px',
+  borderTopRightRadius: '24px',
   border: '1px solid white',
-  minHeight:'43px',
+  minHeight:'40px',
+  zIndex:'1',
   '&:hover': {
     backgroundColor: 'rgb(2,52,48)',
   },

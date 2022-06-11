@@ -48,14 +48,14 @@ function Row(props) {
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
+              <Typography sx={{ fontWeight: 'bold', m: 1 }} variant="h6" gutterBottom component="div">
                 Details
               </Typography>
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
                   {Object.keys(row.payload[0]).map((field) => (
-                      <TableCell>{field}</TableCell>
+                      <TableCell><Typography sx={{ fontWeight: 'bold', m: 1 }}> {field} </Typography></TableCell>
                   ))}
                   </TableRow>
                 </TableHead>
@@ -89,13 +89,14 @@ export default function FancyTable(props) {
     }, [props, setRows])
 
   return (
-    <TableContainer component={Paper}>
+      <div style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
+    <TableContainer component={Paper} style={{maxHeight: '60vh', maxWidth:'75vw', overflow: 'auto', }}>
       <Table aria-label="collapsible table">
-        <TableHead>
-          <TableRow>
+        <TableHead >
+          <TableRow >
             <TableCell />
-            <TableCell>Type</TableCell>
-            <TableCell align="right">Target</TableCell>
+            <TableCell> <Typography sx={{ fontWeight: 'bold', m: 1 }}> Type </Typography> </TableCell>
+            <TableCell align="right"><Typography sx={{ fontWeight: 'bold', m: 1 }}> Target </Typography></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -105,5 +106,6 @@ export default function FancyTable(props) {
         </TableBody>
       </Table>
     </TableContainer>
+    </div>
   );
 }

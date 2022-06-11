@@ -8,15 +8,14 @@ import FancyCheckbox from './FancyCheckbox.jsx';
 import FancyButton from './FancyButton.jsx';
 import Stack from '@mui/material/Stack';
 import FancyTable from './FancyTable.jsx';
+import Typography from '@mui/material/Typography';
 
 const formatResult = (item) => {
   return (
     <div className="result-wrapper">
-        <span className="result-span" style= {{
-            backgroundColor: 'rgb(255, 0, 0,0.5)',
-            marginRight: '20px',
-        }}>{item.type}</span>
-        <span className="result-span" style= {{backgroundColor: 'rgb(107, 218, 255,0.5)'}}>{item.request}</span>
+        <Typography sx={{ fontWeight: 'bold', m: 1 }} component="span">{item.type}:</Typography>
+        <Typography className="result-span"  style= {{backgroundColor: 'rgb(107, 218, 255,0.5)'}} component="span">
+        {item.request}</Typography>
     </div>
   );
 };
@@ -156,7 +155,8 @@ const Dashboard = () => {
     return (
         <>
             <FancyBar updateHistory = {updateHistory}/>
-            <div style={{position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)'}}>
+                <div style={{display: 'flex',  justifyContent:'center', alignItems:'center', height: '25vh'}}>
+                <Stack direction = "column" style={{justifyContent: 'center'}}>
                 <Stack direction="row" style={{justifyContent: 'center'}}>
                     <FancyCheckbox label = 'MX' isChecked={checked['MX']} onChange = {() => handleCheckOnClick('MX')} />
                     <FancyCheckbox label = 'AAAA'  isChecked={checked['AAAA']} onChange = {() => handleCheckOnClick('AAAA')}/>
@@ -173,7 +173,7 @@ const Dashboard = () => {
                     <FancyCheckbox label = 'ANY'  isChecked={checked['ANY']} onChange = {() => handleCheckOnClick('ANY')}/>
                 </Stack>
                 <Stack direction='row'>
-                    <div style={{width: '75vw'}}>
+                    <div style={{width: '75vw', zIndex: '2'}}>
                       <ReactSearchAutocomplete
                         onSelect = {handleOnSelect}
                         items={items}
@@ -190,10 +190,9 @@ const Dashboard = () => {
                     </div>
                     <FancyButton onClick={handleQuery}/>
                 </Stack>
-
-                <FancyTable results={results}/>
+                </Stack>
             </div>
-
+            <FancyTable results={results}/>
         </>
     );
   }
