@@ -11,3 +11,5 @@ export const NS = '/resolve/ns/';
 export const SRV = '/resolve/srv/';
 export const PTR = '/resolve/ptr/';
 export const TXT = '/resolve/txt/';
+export const ANY = '/resolve/any/';
+export const CLEAR_HISTORY = '/config/clearhistory';

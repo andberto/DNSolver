@@ -59,11 +59,9 @@ const Dashboard = () => {
     };
 
     const handleOnFocus = () => {
-      console.log("Focused");
     };
 
     const handleOnClear = () => {
-      console.log("Cleared");
     };
 
     function handleCheckOnClick(id) {
@@ -82,7 +80,13 @@ const Dashboard = () => {
         var results = {};
         for (const key of Object.keys(queries)){
             var res  = await axios.get(queries[key].query);
-            results[key] = {host: queries[key].host, payload: res.data};
+            if(key === 'ANY'){
+                for (const [mapKey, value] of Object.entries(res.data)) {
+                  results[mapKey] = {host: queries[key].host, payload: value};
+                }
+            }else{
+                results[key] = {host: queries[key].host, payload: res.data};
+            }
         };
 
         return results;
@@ -102,6 +106,10 @@ const Dashboard = () => {
         return results;
     }
 
+    function updateHistory(){
+        setItems([]);
+    }
+
     function handleQuery() {
         setResults(new Object());
         var queries = {};
@@ -113,6 +121,7 @@ const Dashboard = () => {
             if(checked[key]) {
                 if(key === "MX") {query += (Constants.MX + searchString);}
                 else if(key === "A") {query += (Constants.A + searchString);}
+                else if(key === "ANY") {query += (Constants.ANY + searchString);}
                 else if(key === "AAAA") {query += (Constants.AAAA + searchString);}
                 else if(key === "SOA") {query += (Constants.SOA + searchString);}
                 else if(key === "IP") {query += (Constants.IP + searchString);}
@@ -131,15 +140,10 @@ const Dashboard = () => {
 
         getResults(queries).then(res => {
             setResults(res);
-            console.log(res)
         });
         getHistory(queries).then(res => {
             setItems(res);
-            //console.log(res);
         });
-
-        //setItems(tempItems);
-
     }
 
     useEffect(() => {
@@ -151,7 +155,7 @@ const Dashboard = () => {
 
     return (
         <>
-            <FancyBar/>
+            <FancyBar updateHistory = {updateHistory}/>
             <div style={{position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)'}}>
                 <Stack direction="row" style={{justifyContent: 'center'}}>
                     <FancyCheckbox label = 'MX' isChecked={checked['MX']} onChange = {() => handleCheckOnClick('MX')} />

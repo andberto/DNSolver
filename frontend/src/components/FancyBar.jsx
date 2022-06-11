@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {  useContext } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -14,14 +14,18 @@ import MenuItem from '@mui/material/MenuItem';
 import FancyAvatar from './FancyAvatar';
 import lgImg from '../images/logo.png';
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import * as Constants from '../Constants';
+import AuthContext from "../contexts/AuthContext.jsx";
 
 const pages = [];
-const settings = ['Profile', 'Logout'];
+const settings = ['Settings', 'Clear history', 'Logout'];
 
-const FancyBar = () => {
+const FancyBar = ({updateHistory}) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
+  const { auth } = useContext(AuthContext);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -38,6 +42,9 @@ const FancyBar = () => {
     if(page === "Logout"){
         localStorage.clear();
         navigate("/login");
+    }else if(page === "Clear history"){
+        axios.get(Constants.BACKEND_URL + auth.username + Constants.CLEAR_HISTORY);
+        updateHistory();
     }
     setAnchorElUser(null);
   };

@@ -57,7 +57,6 @@ app.post('/login', (req, res) => {
 })
 
 app.get('/:username/history', (req, res) => {
-
     var username = req.params.username;
 	var query = { username: username };
 	user.find(query, function(err, result){
@@ -127,7 +126,28 @@ app.get('/:username/resolve/aaaa/:hostname', (req, res) => {
   });
 })
 
-// qua ci va resolve any
+app.get('/:username/resolve/any/:hostname', (req, res) => {
+	var hostname = req.params.hostname;
+	var username = req.params.username;
+	var resolver = new Resolver();
+
+	resolver.resolveAny(hostname, function (err, entries) {
+		var map = {};
+
+		entries.forEach((entry, index, array) => {
+			if(map[entry['type']] !== undefined){
+				map[entry['type']].push(entry);
+			}else{
+				map[entry['type']] = [];
+				map[entry['type']].push(entry);
+			}
+		});
+
+		console.log(map);
+	  	res.status(200).send(map);
+	  	console.log(err);
+	});
+});
 
 app.get('/:username/resolve/soa/:domain', (req, res) => {
   var domain = req.params.domain;
@@ -189,7 +209,7 @@ app.get('/:username/resolve/cname/:hostname', (req, res) => {
 	var entries = [];
 
 	for(var i = 0; i < addresses.length; i++){
-	entries.push({Hostname: addresses[i]})
+		entries.push({Hostname: addresses[i]})
 	}
 
     res.status(200).send(entries);
@@ -234,18 +254,25 @@ app.get('/:username/resolve/srv/:hostname', (req, res) => {
   var resolver = new Resolver();
 
   resolver.resolveSrv(hostname, function (err, addresses) {
+	console.log(hostname, username);
     res.status(200).send(addresses);
     console.log(err);
   });
 })
 
-app.get('/:username/resolve/ptr/:ip', (req, res) => {
-  var ip = req.params.ip;
+app.get('/:username/resolve/ptr/:hostname', (req, res) => {
+  var hostname = req.params.hostname;
   var username = req.params.username;
   var resolver = new Resolver();
 
-  resolver.resolvePtr(ip, function (err, addresses) {
-    res.status(200).send(addresses);
+  resolver.resolvePtr(hostname, function (err, addresses) {
+	var entries = [];
+
+	for(var i = 0; i < addresses.length; i++){
+	  entries.push({Hostname: addresses[i]})
+	}
+
+    res.status(200).send(entries);
     console.log(err);
   });
 })
@@ -275,6 +302,15 @@ app.get('/:username/config/servers', (req, res) => {
 
   var servers = userResolvers[username].getServers();
   res.send(servers);
+})
+
+app.get('/:username/config/clearhistory', (req, res) => {
+  	var username = req.params.username;
+	user.updateOne({ username: username},{ history: []},function(err,result){
+		if(err){ console.log(err); }
+		else{ console.log(result); }
+	});
+	res.status(200).send('Ok');
 })
 
 // Setta un name server per la risoluzione
