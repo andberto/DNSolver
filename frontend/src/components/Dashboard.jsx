@@ -8,6 +8,7 @@ import FancyCheckbox from './FancyCheckbox.jsx';
 import FancyButton from './FancyButton.jsx';
 import Stack from '@mui/material/Stack';
 import FancyTable from './FancyTable.jsx';
+import FancyModal from './FancyModal.jsx';
 import Typography from '@mui/material/Typography';
 
 const formatResult = (item) => {
@@ -24,6 +25,7 @@ const Dashboard = () => {
     const { auth } = useContext(AuthContext);
     const [items, setItems] = useState([]);
     const [results, setResults] = useState({});
+    const [preferences, setPreferences] = useState({});
     const [checked, setChecked] = useState({
         'A': false,
         'AAAA': false,
@@ -41,6 +43,15 @@ const Dashboard = () => {
         'ANY': false
     });
     const [searchString, setSearchString] = useState("");
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => {
+      axios.get(Constants.BACKEND_URL + auth.username + Constants.GET_PREFERENCES).then(function (res) {
+        console.log(res.data.preferences);
+        setPreferences(res.data.preferences);
+      });
+      setOpen(true);
+    };
+    const handleClose = () => setOpen(false);
 
     const handleOnSearch = (string, results) => {
         setSearchString(string);
@@ -154,7 +165,8 @@ const Dashboard = () => {
 
     return (
         <>
-            <FancyBar updateHistory = {updateHistory}/>
+            <FancyBar updateHistory = {updateHistory} handleOpen = {handleOpen}/>
+            <FancyModal handleClose = {handleClose} open = {open} preferences = {preferences}/>
                 <div style={{display: 'flex',  justifyContent:'center', alignItems:'center', height: '25vh'}}>
                 <Stack direction = "column" style={{justifyContent: 'center'}}>
                 <Stack direction="row" style={{justifyContent: 'center'}}>

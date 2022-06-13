@@ -13,3 +13,4 @@ export const PTR = '/resolve/ptr/';
 export const TXT = '/resolve/txt/';
 export const ANY = '/resolve/any/';
 export const CLEAR_HISTORY = '/config/clearhistory';
+export const GET_PREFERENCES = '/config/servers';

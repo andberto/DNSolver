@@ -21,7 +21,7 @@ import AuthContext from "../contexts/AuthContext.jsx";
 const pages = [];
 const settings = ['Settings', 'Clear history', 'Logout'];
 
-const FancyBar = ({updateHistory}) => {
+const FancyBar = ({updateHistory, handleOpen}) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
@@ -45,6 +45,9 @@ const FancyBar = ({updateHistory}) => {
     }else if(page === "Clear history"){
         axios.get(Constants.BACKEND_URL + auth.username + Constants.CLEAR_HISTORY);
         updateHistory();
+    }
+    else if(page === "Settings") {
+        handleOpen();
     }
     setAnchorElUser(null);
   };
