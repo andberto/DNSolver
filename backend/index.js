@@ -143,9 +143,9 @@ app.get('/:username/resolve/any/:hostname', (req, res) => {
 	var query = { username: username};
 	user.find(query, function(err, result){
 		resolver.setServers([result[0].preferences.primary_dns, result[0].preferences.secondary_dns]);
+		console.log(resolver.getServers());
 		resolver.resolveAny(hostname, function (err, entries) {
 			var map = {};
-
 			entries.forEach((entry, index, array) => {
 				if(map[entry['type']] !== undefined){
 					map[entry['type']].push(entry);
@@ -156,12 +156,10 @@ app.get('/:username/resolve/any/:hostname', (req, res) => {
 			});
 
 			console.log(map);
-				res.status(200).send(map);
-				console.log(err);
+			res.status(200).send(map);
+			console.log(err);
 		});
 	});
-
-
 });
 
 app.get('/:username/resolve/soa/:domain', (req, res) => {
@@ -392,12 +390,19 @@ app.post('/:username/config/servers', (req, res) => {
 	var dns1 = req.body.dns1;
 	var dns2 = req.body.dns2;
 
-	user.update(
+	user.updateOne(
 		{username: username},
 		{$set: { preferences: {primary_dns: dns1, secondary_dns: dns2}}},
+		function(err,result){
+			if(err){
+				res.status(500).send("Server error");
+				console.log(err);
+			}else{
+				res.status(200).send("Ok");
+				console.log(result);
+			}
+		}
 	);
-
-  res.status(200).send("Ok");
 })
 
 app.listen(port, () => {

@@ -46,7 +46,6 @@ const Dashboard = () => {
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
       axios.get(Constants.BACKEND_URL + auth.username + Constants.GET_PREFERENCES).then(function (res) {
-        console.log(res.data.preferences);
         setPreferences(res.data.preferences);
       });
       setOpen(true);
@@ -88,17 +87,16 @@ const Dashboard = () => {
 
     async function getResults(queries){
         var results = {};
-        for (const key of Object.keys(queries)){
+        for (const key of Object.keys(queries)) {
             var res  = await axios.get(queries[key].query);
-            if(key === 'ANY'){
+            if(key === 'ANY') {
                 for (const [mapKey, value] of Object.entries(res.data)) {
                   results[mapKey] = {host: queries[key].host, payload: value};
                 }
-            }else{
+            } else {
                 results[key] = {host: queries[key].host, payload: res.data};
             }
         };
-
         return results;
     }
 
@@ -107,9 +105,8 @@ const Dashboard = () => {
         var res = [];
         for (const key of Object.keys(queries)){
             res = await axios.put(Constants.BACKEND_URL + auth.username + '/history', {
-                        entry: { type: key, request: queries[key].host }
-                      });
-
+            entry: { type: key, request: queries[key].host }
+        });
         };
         results = res.data;
 
@@ -166,7 +163,8 @@ const Dashboard = () => {
     return (
         <>
             <FancyBar updateHistory = {updateHistory} handleOpen = {handleOpen}/>
-            <FancyModal handleClose = {handleClose} open = {open} preferences = {preferences}/>
+            <FancyModal handleClose = {handleClose} open = {open}
+                        setOpen = {setOpen} setPreferences= {setPreferences} preferences = {preferences}/>
                 <div style={{display: 'flex',  justifyContent:'center', alignItems:'center', height: '25vh'}}>
                 <Stack direction = "column" style={{justifyContent: 'center'}}>
                 <Stack direction="row" style={{justifyContent: 'center'}}>
