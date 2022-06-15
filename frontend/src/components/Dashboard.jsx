@@ -87,8 +87,14 @@ const Dashboard = () => {
 
     async function getResults(queries){
         var results = {};
+        var errors = "";
         for (const key of Object.keys(queries)) {
-            var res  = await axios.get(queries[key].query);
+            var res = await axios.get(queries[key].query).catch(function (error) {
+              errors += key + " ";
+            });
+            if (res == undefined) {
+              continue;
+            }
             if(key === 'ANY') {
                 for (const [mapKey, value] of Object.entries(res.data)) {
                   results[mapKey] = {host: queries[key].host, payload: value};
@@ -97,6 +103,7 @@ const Dashboard = () => {
                 results[key] = {host: queries[key].host, payload: res.data};
             }
         };
+        alert("Problems occurred with " + errors);
         return results;
     }
 

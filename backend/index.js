@@ -55,11 +55,42 @@ app.post('/login', (req, res) => {
 	});
 })
 
+app.post('/register', (req, res) => {
+	var username = req.body.username;
+	var query = { username: username };
+
+	user.find(query, function(err, result)
+	{
+		  if (err) throw err;
+
+	    if (typeof result !== 'undefined' && result.length > 0) {
+					  res.status(404).send("Username already exists!");
+			}
+			else
+			{
+				var userData = {
+					_id: new ObjectID(),
+					name: req.body.name,
+					password: req.body.password,
+					surname: req.body.surname,
+					username: req.body.username,
+					history: [],
+					preferences: {primary_dns: '8.8.8.8', secondary_dns: '8.8.8.4'}
+			}
+			var userObj = new user(userData);
+			userObj.save(function(error, data)
+			{
+				 res.status(200).send("Ok");
+			});
+		}
+	});
+})
+
 app.get('/:username/history', (req, res) => {
   var username = req.params.username;
 	var query = { username: username };
 	user.find(query, function(err, result){
-		if(err){
+		if(err) {
             res.status(500).send("Internal Server Error");
         }else if (result.length == 0 && !err){
             res.status(404).send("Not Found");
@@ -67,7 +98,7 @@ app.get('/:username/history', (req, res) => {
             res.status(200).send({
 				history: result[0].history,
 			});
-        }
+      }
 	});
 })
 
@@ -95,22 +126,22 @@ app.get('/:username/resolve/a/:hostname', (req, res) => {
   var hostname = req.params.hostname;
 
 	var resolver = new Resolver();
-	var query = { username: username};
-	user.find(query, function(err, result){
-		resolver.setServers([result[0].preferences.primary_dns, result[0].preferences.secondary_dns]);
-		resolver.resolve4(hostname, function (err, addresses, family) {
-		var entries = [];
+	var query = { username: username };
 
+	user.find(query, function(err, result){
+	resolver.setServers([result[0].preferences.primary_dns, result[0].preferences.secondary_dns]);
+		resolver.resolve4(hostname, function (err, addresses, family) {
+			var entries = [];
+			if (err || addresses == undefined) {
+				res.status(400).send("Error");
+				return;
+			}
 			for(var i = 0; i < addresses.length; i++) {
 				entries.push({IP: addresses[i]})
 			}
-
 			res.status(200).send(entries);
-			console.log(err);
 		});
 	});
-
-
 });
 
 // da hostname a indirizzo IpV6
@@ -119,21 +150,21 @@ app.get('/:username/resolve/aaaa/:hostname', (req, res) => {
   var username = req.params.username;
   var resolver = new Resolver();
 	var query = { username: username};
-	user.find(query, function(err, result){
+	user.find(query, function(err, result) {
 		resolver.setServers([result[0].preferences.primary_dns, result[0].preferences.secondary_dns]);
 		resolver.resolve6(hostname, function (err, addresses, family) {
-		var entries = [];
+			if (err || addresses == undefined) {
+				res.status(400).send("Error");
+				return;
+			}
+			var entries = [];
 
-		for(var i = 0; i < addresses.length; i++){
-			entries.push({IP: addresses[i]})
-		}
-
+			for(var i = 0; i < addresses.length; i++){
+				entries.push({IP: addresses[i]})
+			}
 			res.status(200).send(entries);
-			console.log(err);
 		});
 	});
-
-
 })
 
 app.get('/:username/resolve/any/:hostname', (req, res) => {
@@ -141,23 +172,23 @@ app.get('/:username/resolve/any/:hostname', (req, res) => {
 	var username = req.params.username;
 	var resolver = new Resolver();
 	var query = { username: username};
-	user.find(query, function(err, result){
+	user.find(query, function(err, result) {
 		resolver.setServers([result[0].preferences.primary_dns, result[0].preferences.secondary_dns]);
-		console.log(resolver.getServers());
 		resolver.resolveAny(hostname, function (err, entries) {
+			if (err || entries == undefined) {
+				res.status(400).send("Error");
+				return;
+			}
 			var map = {};
 			entries.forEach((entry, index, array) => {
 				if(map[entry['type']] !== undefined){
 					map[entry['type']].push(entry);
-				}else{
+				} else {
 					map[entry['type']] = [];
 					map[entry['type']].push(entry);
 				}
 			});
-
-			console.log(map);
 			res.status(200).send(map);
-			console.log(err);
 		});
 	});
 });
@@ -170,12 +201,13 @@ app.get('/:username/resolve/soa/:domain', (req, res) => {
 	user.find(query, function(err, result){
 		resolver.setServers([result[0].preferences.primary_dns, result[0].preferences.secondary_dns]);
 		resolver.resolveSoa(domain, function (err, entry) {
+			if (err || entry == undefined) {
+				res.status(400).send("Error");
+				return;
+			}
 			res.status(200).send([entry]);
-			console.log(err);
 		});
 	});
-
-
 })
 
 // da IpV4 o IpV6 ad hostname
@@ -184,20 +216,21 @@ app.get('/:username/resolve/ip/:ip', (req, res) => {
   var username = req.params.username;
   var resolver = new Resolver();
 	var query = { username: username};
-	user.find(query, function(err, result){
+	user.find(query, function(err, result) {
 		resolver.setServers([result[0].preferences.primary_dns, result[0].preferences.secondary_dns]);
 		resolver.reverse(ip, function (err, hostnames) {
+			if (err || hostnames == undefined) {
+				res.status(400).send("Error");
+				return;
+			}
 			var entries = [];
 
 			for(var i = 0; i < hostnames.length; i++){
 				entries.push({Hostname: hostnames[i]})
 			}
 			res.status(200).send(entries);
-			console.log(err);
 		});
 	});
-
-
 })
 
 // ritorna CA per un record dns
@@ -210,12 +243,13 @@ app.get('/:username/resolve/caa/:domain', (req, res) => {
 	user.find(query, function(err, result){
 		resolver.setServers([result[0].preferences.primary_dns, result[0].preferences.secondary_dns]);
 		resolver.resolveCaa(domain, function (err, caas) {
+			if (err || caas == undefined) {
+				res.status(400).send("Error");
+				return;
+			}
 			res.status(200).send(caas);
-			console.log(err);
 		});
 	});
-
-
 })
 
 // Risolve indirizzo IP e porta in un hostname e in un servizio attivo su una porta
@@ -224,7 +258,10 @@ app.get('/:username/lookup/service/:ip/:port', (req, res) => {
   var port = req.params.port;
 
   dns.lookupService(ip, parseInt(port), function (err, hostname, service) {
-	  console.log(err);
+	  	if(err) {
+				res.status(400).send("Error");
+				return;
+			}
       res.status(200).send([{Host: hostname, Port: port, Service: service}]);
   });
 })
@@ -238,18 +275,18 @@ app.get('/:username/resolve/cname/:hostname', (req, res) => {
 	user.find(query, function(err, result) {
 		resolver.setServers([result[0].preferences.primary_dns, result[0].preferences.secondary_dns]);
 		resolver.resolveCname(hostname, function (err, addresses) {
-		var entries = [];
+			if (err || addresses == undefined) {
+				res.status(400).send("Error");
+				return;
+			}
+			var entries = [];
 
-		for(var i = 0; i < addresses.length; i++){
-			entries.push({Hostname: addresses[i]})
-		}
-
+			for(var i = 0; i < addresses.length; i++){
+				entries.push({Hostname: addresses[i]})
+			}
 			res.status(200).send(entries);
-			console.log(err);
 		});
 	});
-
-
 })
 
 // Torna i record mx per un certo dominio
@@ -258,15 +295,16 @@ app.get('/:username/resolve/mx/:domain', (req, res) => {
   var username = req.params.username;
   var resolver = new Resolver();
 	var query = { username: username};
-	user.find(query, function(err, result){
+	user.find(query, function(err, result) {
+		if (err || result == undefined) {
+			res.status(400).send("Error");
+			return;
+		}
 		resolver.setServers([result[0].preferences.primary_dns, result[0].preferences.secondary_dns]);
 		resolver.resolveMx(domain, function (err, names) {
 			res.status(200).send(names);
-			console.log(err);
 		});
 	});
-
-
 })
 
 // name server disponibili per un hostname
@@ -276,21 +314,21 @@ app.get('/:username/resolve/ns/:domain', (req, res) => {
   var resolver = new Resolver();
 	var query = { username: username};
 
-	user.find(query, function(err, result){
+	user.find(query, function(err, result) {
 		resolver.setServers([result[0].preferences.primary_dns, result[0].preferences.secondary_dns]);
 		resolver.resolveNs(domain, function (err, addresses) {
+			if (err || result == undefined) {
+				res.status(400).send("Error");
+				return;
+			}
 			var entries = [];
 
 			for(var i = 0; i < addresses.length; i++){
 				entries.push({NameServer: addresses[i]})
 			}
-
 			res.status(200).send(entries);
-			console.log(err);
 		});
 	});
-
-
 })
 
 // name server disponibili per un hostname
@@ -300,16 +338,16 @@ app.get('/:username/resolve/srv/:hostname', (req, res) => {
   var resolver = new Resolver();
 	var query = { username: username};
 
-	user.find(query, function(err, result){
+	user.find(query, function(err, result) {
 		resolver.setServers([result[0].preferences.primary_dns, result[0].preferences.secondary_dns]);
 		resolver.resolveSrv(hostname, function (err, addresses) {
-		console.log(hostname, username);
+			if (err || result == undefined) {
+				res.status(400).send("Error");
+				return;
+			}
 			res.status(200).send(addresses);
-			console.log(err);
 		});
 	});
-
-
 })
 
 app.get('/:username/resolve/ptr/:hostname', (req, res) => {
@@ -317,21 +355,21 @@ app.get('/:username/resolve/ptr/:hostname', (req, res) => {
   var username = req.params.username;
   var resolver = new Resolver();
 	var query = { username: username};
-	user.find(query, function(err, result){
+	user.find(query, function(err, result) {
 		resolver.setServers([result[0].preferences.primary_dns, result[0].preferences.secondary_dns]);
 		resolver.resolvePtr(hostname, function (err, addresses) {
-		var entries = [];
+			if (err || result == undefined) {
+				res.status(400).send("Error");
+				return;
+			}
+			var entries = [];
 
-		for(var i = 0; i < addresses.length; i++){
-			entries.push({Hostname: addresses[i]})
-		}
-
+			for(var i = 0; i < addresses.length; i++){
+				entries.push({Hostname: addresses[i]})
+			}
 			res.status(200).send(entries);
-			console.log(err);
 		});
 	});
-
-
 })
 
 // Torna alcune informazioni
@@ -340,46 +378,45 @@ app.get('/:username/resolve/txt/:hostname', (req, res) => {
   var username = req.params.username;
   var resolver = new Resolver();
 	var query = { username: username};
-	user.find(query, function(err, result){
+	user.find(query, function(err, result) {
 		resolver.setServers([result[0].preferences.primary_dns, result[0].preferences.secondary_dns]);
 		resolver.resolveTxt(hostname, function (err, txts) {
-		var entries = [];
+			if (err  || txts == undefined) {
+				res.status(400).send("Error");
+				return;
+			}
+			var entries = [];
 
-		for(var i = 0; i < txts.length; i++){
-			entries.push({Value: txts[i]})
-		}
+			for(var i = 0; i < txts.length; i++){
+				entries.push({Value: txts[i]})
+			}
 
 			res.status(200).send(entries);
-			console.log(err);
 		});
 	});
-
-
 })
 
 // Ritorna i server impostati per il resolver
 app.get('/:username/config/servers', (req, res) => {
   var username = req.params.username;
 	var query = { username: username};
-	user.find(query, function(err, result){
-		if(err){
-					console.log(err);
-          res.status(500).send("Internal Server Error");
-        }else if (result.length == 0 && !err){
-            res.status(404).send("Not Found");
-        }else if(result.length > 0 && !err) {
-	        res.status(200).send({
-						preferences: result[0].preferences,
-					});
-      }
+	user.find(query, function(err, result) {
+		if(err) {
+	    res.status(500).send("Internal Server Error");
+	  } else if (result.length == 0 && !err) {
+	      res.status(404).send("Not Found");
+	  } else if(result.length > 0 && !err) {
+	      res.status(200).send({
+					preferences: result[0].preferences,
+				});
+    }
 	});
 })
 
 app.get('/:username/config/clearhistory', (req, res) => {
   var username = req.params.username;
-	user.updateOne({ username: username},{ history: []}, function(err,result){
-		if(err){ console.log(err); }
-		else{ console.log(result); }
+	user.updateOne({ username: username}, { history: []}, function(err,result) {
+		if(err) { res.status(400).send("Error"); return; }
 	});
 	res.status(200).send('Ok');
 })
@@ -393,14 +430,12 @@ app.post('/:username/config/servers', (req, res) => {
 	user.updateOne(
 		{username: username},
 		{$set: { preferences: {primary_dns: dns1, secondary_dns: dns2}}},
-		function(err,result){
-			if(err){
+		function(err, result) {
+			if(err) {
 				res.status(500).send("Server error");
-				console.log(err);
-			}else{
-				res.status(200).send("Ok");
-				console.log(result);
+				return;
 			}
+			res.status(200).send("Ok");
 		}
 	);
 })

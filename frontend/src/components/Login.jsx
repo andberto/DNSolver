@@ -16,6 +16,7 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import bgImg from '../images/background.png'
 import * as Constants from '../Constants';
+import { sha3_512 } from 'js-sha3';
 import FancyCheckbox from './FancyCheckbox.jsx';
 
 const WhiteBorderTextField = styled(TextField)`
@@ -50,42 +51,44 @@ const Login = () => {
     }, [])
 
     const handleSubmit = (e) => {
-        e.preventDefault();
-        axios.post(Constants.BACKEND_URL + 'login', {
-            username: user,
-            password: pwd
-        })
-        .then(function (response) {
-            setAuth({
-                success: true,
-                name: response.data.name,
-                surname: response.data.surname,
-                username: response.data.username
-            });
+      let hash = sha3_512(pwd);
 
-            if(checked){
-                localStorage.setItem('auth', JSON.stringify({ success: true,
-                name: response.data.name,
-                surname: response.data.surname,
-                username: response.data.username }));
-            }
+      e.preventDefault();
+      axios.post(Constants.BACKEND_URL + 'login', {
+          username: user,
+          password: hash
+      })
+      .then(function (response) {
+          setAuth({
+              success: true,
+              name: response.data.name,
+              surname: response.data.surname,
+              username: response.data.username
+          });
 
-            navigate('/dashboard');
-        })
-        .catch(function (error) {
-            if (!error?.response) {
-                alert('Connection timeout!');
-                console.log('Server timeout!');
-            } else if (error.response?.status === 404) {
-                setIsFormInvalid(true);
-                console.log('Wrong username or password!');
-            } else if (error.response?.status === 500) {
-                alert('Server error!');
-                console.log('Server error!');
-            } else {
-                console.log('Unknown cause (login failed)!');
-            }
-        });
+          if(checked){
+              localStorage.setItem('auth', JSON.stringify({ success: true,
+              name: response.data.name,
+              surname: response.data.surname,
+              username: response.data.username }));
+          }
+
+          navigate('/dashboard');
+      })
+      .catch(function (error) {
+          if (!error?.response) {
+              alert('Connection timeout!');
+              console.log('Server timeout!');
+          } else if (error.response?.status === 404) {
+              setIsFormInvalid(true);
+              console.log('Wrong username or password!');
+          } else if (error.response?.status === 500) {
+              alert('Server error!');
+              console.log('Server error!');
+          } else {
+              console.log('Unknown cause (login failed)!');
+          }
+      });
     }
 
     const handleCheckOnClick = (e) => {
@@ -146,7 +149,7 @@ const Login = () => {
                 <LockOutlinedIcon />
               </Avatar>
               <Typography component="h1" variant="h5">
-                Sign in
+                Log in
               </Typography>
               <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
                 <WhiteBorderTextField
@@ -187,16 +190,11 @@ const Login = () => {
                   sx={{ mt: 3, mb: 2 }}
                   style={{backgroundColor: '#13aa52', color: 'white'}}
                 >
-                  Sign In
+                  Log In
                 </Button>
                 <Grid container>
-                  <Grid item xs>
-                    <Link  href="#" variant="body2">
-                      Forgot password?
-                    </Link>
-                  </Grid>
                   <Grid item>
-                    <Link component={lk} to="/registration" variant="body2">
+                    <Link component={lk} to="/signin" variant="body2">
                       {"Don't have an account? Sign Up"}
                     </Link>
                   </Grid>
