@@ -48,7 +48,7 @@ const Login = () => {
 
         document.title = "DNSolver - Login"
         userRef.current.focus();
-    }, [])
+    }, [setAuth, navigate])
 
     const handleSubmit = (e) => {
       let hash = sha3_512(pwd);

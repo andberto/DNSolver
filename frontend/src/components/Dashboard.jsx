@@ -56,18 +56,12 @@ const Dashboard = () => {
         setSearchString(string);
     };
 
-    const handleOnHover = (result) => {
-    };
-
     const handleOnSelect = (item) => {
         setSearchString(item.request);
         for (const [key, value] of Object.entries(checked)) {
             checked[key] = false;
         }
         checked[item.type] = true;
-    };
-
-    const handleOnFocus = () => {
     };
 
     const handleOnClear = () => {
@@ -88,11 +82,13 @@ const Dashboard = () => {
     async function getResults(queries){
         var results = {};
         var errors = "";
+        var isError = false;
         for (const key of Object.keys(queries)) {
             var res = await axios.get(queries[key].query).catch(function (error) {
               errors += key + " ";
             });
-            if (res == undefined) {
+            if (res === undefined) {
+              isError = true;
               continue;
             }
             if(key === 'ANY') {
@@ -103,7 +99,10 @@ const Dashboard = () => {
                 results[key] = {host: queries[key].host, payload: res.data};
             }
         };
-        alert("Problems occurred with " + errors);
+        if(isError) {
+            alert("Problems occurred with " + errors);
+            isError = false;
+        }
         return results;
     }
 
@@ -127,8 +126,6 @@ const Dashboard = () => {
     function handleQuery() {
         setResults(new Object());
         var queries = {};
-        var history = [];
-        var tempItems = new Array();
 
         Object.keys(checked).forEach(key => {
             var query = Constants.BACKEND_URL + auth.username;

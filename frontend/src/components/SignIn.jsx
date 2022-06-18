@@ -17,7 +17,6 @@ import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import bgImg from '../images/background.png'
 import * as Constants from '../Constants';
 import { sha3_512 } from 'js-sha3';
-import FancyCheckbox from './FancyCheckbox.jsx';
 
 const WhiteBorderTextField = styled(TextField)`
   & label.Mui-focused {
@@ -48,9 +47,9 @@ const SignIn = () => {
             navigate('/dashboard');
         }
 
-        document.title = "DNSolver - Login"
+        document.title = "DNSolver - Sign-Up"
         userRef.current.focus();
-    }, [])
+    }, [setAuth, navigate])
 
     const handleSubmit = (e) => {
       e.preventDefault();
@@ -58,7 +57,7 @@ const SignIn = () => {
       let hash1 = sha3_512(pwd);
       let hash2 = sha3_512(rPwd);
 
-      if (hash1 !== hash2 || (pwd.length == 0 || name.length == 0 || user.length == 0 || surname.length == 0)) {
+      if (hash1 !== hash2 || (pwd.length === 0 || name.length === 0 || user.length === 0 || surname.length === 0)) {
         setIsFormInvalid(true);
         return;
       }
@@ -126,7 +125,7 @@ const SignIn = () => {
           <Grid style = {{backgroundColor: 'rgb(2,52,48)'}} item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
             <Box
               sx={{
-                my: 8,
+                my: 2,
                 mx: 4,
                 display: 'flex',
                 flexDirection: 'column',
@@ -137,7 +136,7 @@ const SignIn = () => {
                 <LockOutlinedIcon />
               </Avatar>
               <Typography component="h1" variant="h5">
-                Sign in
+                Sign up
               </Typography>
               <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
                 <WhiteBorderTextField
@@ -217,7 +216,7 @@ const SignIn = () => {
                   sx={{ mt: 3, mb: 2 }}
                   style={{backgroundColor: '#13aa52', color: 'white'}}
                 >
-                  Sign In
+                  Sign up
                 </Button>
                 <Grid container>
                   <Grid item>

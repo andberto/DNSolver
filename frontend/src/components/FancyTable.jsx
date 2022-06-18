@@ -1,6 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
-
-import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react'
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';

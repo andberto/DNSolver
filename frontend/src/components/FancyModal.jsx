@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext } from 'react'
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -8,7 +8,7 @@ import * as Constants from '../Constants';
 import AuthContext from "../contexts/AuthContext.jsx";
 import Divider from '@material-ui/core/Divider';
 import TextField from '@mui/material/TextField';
-import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 
 const style = {
   position: 'absolute',
