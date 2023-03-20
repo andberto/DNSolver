@@ -1,6 +1,6 @@
 ![logo](https://user-images.githubusercontent.com/91635053/184529727-d16125da-0f49-4120-8c96-43e6b77395c2.png)
 
-👬 Thanks to [Bertogalli Andrea](https://github.com/Andrea-Bertogalli)
+👬 Thanks to [Nicolò Tombini](https://github.com/tombinic/DNSolver)
 
 > As part of the Telematics course project, it was decided to develop a DNS resolver usable through REST API then through HTTP, also to render
 more user-friendly, the project wanted to develop a GUI accessible through the browser.
